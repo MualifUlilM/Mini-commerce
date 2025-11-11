@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:dartz/dartz.dart';
+import 'package:tugas/features/products/data/models/category_product_model.dart';
 import 'package:tugas/features/products/data/models/product_model.dart';
 import 'package:tugas/features/products/data/models/detail_product_model.dart';
 import 'package:tugas/features/products/presentation/pages/detail_product.dart';
@@ -45,6 +46,25 @@ class ApiService {
         Uri.parse('https://fakestoreapi.com/products/categories'),
       );
       return Right(List<String>.from(jsonDecode(response.body)));
+    } catch (e) {
+      return Left((e).toString());
+    }
+  }
+
+  Future<Either<String, List<CategoryProductModel>>> getProductByCategory(
+    String categoryName,
+  ) async {
+    try {
+      final response = await client.get(
+        Uri.parse('https://fakestoreapi.com/products/category/$categoryName'),
+      );
+      return Right(
+        List<CategoryProductModel>.from(
+          jsonDecode(
+            response.body,
+          ).map((x) => CategoryProductModel.fromJson(x)).toList(),
+        ),
+      );
     } catch (e) {
       return Left((e).toString());
     }

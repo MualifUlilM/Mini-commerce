@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tugas/core/constants/app_colors.dart';
-import 'package:tugas/features/products/data/models/product_model.dart';
 import 'package:tugas/features/products/presentation/bloc/detailproduct/detail_product_bloc.dart';
 
 class DetailProduct extends StatefulWidget {
   const DetailProduct({super.key, required this.product});
-  final ProductModel product;
+  final product;
 
   @override
   State<DetailProduct> createState() => _DetailProductState();

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tugas/features/products/data/datasources/api_service.dart';
+import 'package:tugas/features/products/presentation/bloc/bloc/category_product_bloc.dart';
+import 'package:tugas/features/products/presentation/bloc/categories/categories_cubit.dart';
 import 'package:tugas/features/products/presentation/bloc/detailproduct/detail_product_bloc.dart';
 import 'package:tugas/features/products/presentation/bloc/products/product_bloc.dart';
 import 'package:tugas/features/products/presentation/pages/home_page.dart';
@@ -32,6 +34,14 @@ class MyApp extends StatelessWidget {
             BlocProvider(
               create: (context) =>
                   DetailProductBloc(ApiService(client: http.Client())),
+            ),
+            BlocProvider(
+              create: (context) =>
+                  CategoryProductBloc(ApiService(client: http.Client())),
+            ),
+            BlocProvider(
+              create: (context) =>
+                  CategoriesCubit(ApiService(client: http.Client())),
             ),
           ],
           child: MaterialApp(
