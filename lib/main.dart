@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tugas/features/products/data/datasources/api_service.dart';
-import 'package:tugas/features/products/presentation/bloc/bloc/product_bloc.dart';
+import 'package:tugas/features/products/presentation/bloc/detailproduct/detail_product_bloc.dart';
+import 'package:tugas/features/products/presentation/bloc/products/product_bloc.dart';
 import 'package:tugas/features/products/presentation/pages/home_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
@@ -27,6 +28,10 @@ class MyApp extends StatelessWidget {
             BlocProvider(
               create: (context) =>
                   ProductBloc(ApiService(client: http.Client())),
+            ),
+            BlocProvider(
+              create: (context) =>
+                  DetailProductBloc(ApiService(client: http.Client())),
             ),
           ],
           child: MaterialApp(
