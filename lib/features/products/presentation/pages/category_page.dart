@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tugas/core/constants/app_colors.dart';
-import 'package:tugas/features/products/presentation/bloc/bloc/category_product_bloc.dart';
+import 'package:tugas/features/products/presentation/bloc/category/category_product_bloc.dart';
 import 'package:tugas/features/products/presentation/pages/detail_product.dart';
 
 class CategoryPage extends StatefulWidget {
