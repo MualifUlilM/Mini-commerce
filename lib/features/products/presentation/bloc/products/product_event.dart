@@ -8,3 +8,23 @@ sealed class ProductEvent extends Equatable {
 }
 
 class FetchProductList extends ProductEvent {}
+
+class SearchProduct extends ProductEvent {
+  final String keyword;
+
+  SearchProduct({required this.keyword});
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [keyword];
+}
+
+class SearchResult extends ProductEvent {
+  final List<ProductModel> results;
+
+  SearchResult({required this.results});
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [results];
+}

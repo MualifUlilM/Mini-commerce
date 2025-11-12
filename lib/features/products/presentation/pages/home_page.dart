@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tugas/core/constants/app_colors.dart';
-import 'package:tugas/features/products/presentation/bloc/categories/categories_cubit.dart';
 import 'package:tugas/features/products/presentation/bloc/products/product_bloc.dart';
+import 'package:tugas/features/products/presentation/cubit/categories/categories_cubit.dart';
 import 'package:tugas/features/products/presentation/pages/category_page.dart';
 import 'package:tugas/features/products/presentation/pages/detail_product.dart';
 
@@ -30,6 +30,8 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         // centerTitle: true,
         elevation: 0,
+        scrolledUnderElevation: 0.0,
+        backgroundColor: Colors.transparent,
         // backgroundColor: Colors.amber,
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -55,43 +57,59 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: SearchBar(
+              leading: Icon(Icons.search),
+              padding: WidgetStateProperty.all(
+                EdgeInsets.symmetric(horizontal: 20),
+              ),
+              onChanged: (value) {
+                context.read<ProductBloc>().add(SearchProduct(keyword: value));
+              },
+            ),
+          ),
           BlocBuilder<CategoriesCubit, CategoriesState>(
             builder: (context, state) {
               if (state is CategoriesLoading) {
-                return Center(child: CircularProgressIndicator());
+                // return Center(child: CircularProgressIndicator());
+                return Text('');
               }
               if (state is CategoriesLoaded) {
-                return SizedBox(
-                  height: 60,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: state.categories.length,
-                    itemBuilder: (context, index) {
-                      final categoriesProduct = state.categories[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: InkWell(
-                          splashColor: Colors.transparent,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return CategoryPage(
-                                    categoryName: categoriesProduct,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          child: Chip(label: Text(categoriesProduct)),
-                        ),
-                      );
-                    },
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: SizedBox(
+                    height: 60,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: state.categories.length,
+                      itemBuilder: (context, index) {
+                        final categoriesProduct = state.categories[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return CategoryPage(
+                                      categoryName: categoriesProduct,
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            child: Chip(label: Text(categoriesProduct)),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 );
               }
-              return Text('');
+              return Text('No Data');
             },
           ),
           BlocBuilder<ProductBloc, ProductState>(
@@ -132,11 +150,13 @@ class _HomePageState extends State<HomePage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              SizedBox(
-                                height: (size.height / 2) * 0.4,
-                                child: Image.network(
-                                  product.image,
-                                  fit: BoxFit.contain,
+                              Flexible(
+                                child: SizedBox(
+                                  height: (size.height / 2) * 0.4,
+                                  child: Image.network(
+                                    product.image,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
                               ),
                               Text(
