@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:tugas/core/constants/app_colors.dart';
+import 'package:tugas/core/theme/app_colors.dart';
 import 'package:tugas/features/products/presentation/bloc/category/category_product_bloc.dart';
-import 'package:tugas/features/products/presentation/cubit/Favorites/favorites_cubit.dart';
+import 'package:tugas/features/favorites/presentation/cubit/Favorites/favorites_cubit.dart';
 import 'package:tugas/features/products/presentation/pages/detail_product.dart';
 
 class CategoryPage extends StatefulWidget {
@@ -20,6 +20,7 @@ class _CategoryPageState extends State<CategoryPage> {
     context.read<CategoryProductBloc>().add(
       GetCategoryProductEvent(categoryName: widget.categoryName),
     );
+    context.read<FavoritesCubit>().loadFavorites();
     super.initState();
   }
 
@@ -57,10 +58,6 @@ class _CategoryPageState extends State<CategoryPage> {
                   itemCount: state.categoryProduct.length,
                   itemBuilder: (context, index) {
                     final product = state.categoryProduct[index];
-                    // final isFav = state.favorites.contains(product);
-                    final isFav = state.favorites.any(
-                      (fav) => fav.id == product.id,
-                    );
                     print('fav from category ${state.favorites}');
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,10 +70,7 @@ class _CategoryPageState extends State<CategoryPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return DetailProduct(
-                                    product: product,
-                                    favorites: isFav,
-                                  );
+                                  return DetailProduct(product: product);
                                 },
                               ),
                             );
@@ -96,7 +90,10 @@ class _CategoryPageState extends State<CategoryPage> {
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors.primaryLight,
+                                ),
                               ),
                               Text(
                                 '${product.category}',
@@ -115,7 +112,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
-                            color: AppColors.accent,
+                            color: AppColors.accentLight,
                           ),
                         ),
                         Row(
@@ -134,29 +131,42 @@ class _CategoryPageState extends State<CategoryPage> {
                             ),
                             Row(
                               children: [
-                                InkWell(
-                                  onTap: () {
-                                    context
-                                        .read<FavoritesCubit>()
-                                        .ToggleFavorite(product);
+                                BlocBuilder<FavoritesCubit, FavoritesState>(
+                                  builder: (context, state) {
+                                    List<int> _currentFavIds = [];
+                                    if (state is FavoriteLoaded) {
+                                      _currentFavIds = state.favorites;
+                                    }
+                                    final isFav = _currentFavIds.contains(
+                                      product.id,
+                                    );
+                                    return InkWell(
+                                      onTap: () {
+                                        context
+                                            .read<FavoritesCubit>()
+                                            .toggleFavorite(product);
+                                      },
+                                      splashColor: Colors.transparent,
+                                      radius: 200,
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: AnimatedSwitcher(
+                                        duration: Duration(milliseconds: 300),
+                                        child: Icon(
+                                          isFav
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: isFav
+                                              ? Colors.red
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                    );
                                   },
-                                  splashColor: Colors.transparent,
-                                  radius: 200,
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 300),
-                                    child: Icon(
-                                      isFav
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: isFav ? Colors.red : Colors.grey,
-                                    ),
-                                  ),
                                 ),
                                 SizedBox(width: 10),
                                 Icon(
                                   Icons.add_shopping_cart,
-                                  color: AppColors.secondary,
+                                  color: AppColors.secondaryLight,
                                   size: 18.sp,
                                 ),
                               ],
@@ -239,7 +249,10 @@ class _CategoryPageState extends State<CategoryPage> {
                   Text(
                     '\$ {product.price}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, color: AppColors.accent),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: AppColors.accentLight,
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -270,7 +283,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           SizedBox(width: 10),
                           Icon(
                             Icons.add_shopping_cart,
-                            color: AppColors.secondary,
+                            color: AppColors.secondaryLight,
                             size: 18.sp,
                           ),
                         ],

@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tugas/core/constants/app_colors.dart';
+import 'package:tugas/core/theme/app_colors.dart';
 import 'package:tugas/features/products/presentation/bloc/detailproduct/detail_product_bloc.dart';
-import 'package:tugas/features/products/presentation/cubit/Favorites/favorites_cubit.dart';
+import 'package:tugas/features/favorites/presentation/cubit/Favorites/favorites_cubit.dart';
 
 class DetailProduct extends StatefulWidget {
-  const DetailProduct({
-    super.key,
-    required this.product,
-    required this.favorites,
-  });
+  const DetailProduct({super.key, required this.product});
   final product;
-  final favorites;
 
   @override
   State<DetailProduct> createState() => _DetailProductState();
@@ -24,6 +19,7 @@ class _DetailProductState extends State<DetailProduct> {
     context.read<DetailProductBloc>().add(
       GetDetailProduct(idProduct: widget.product.id),
     );
+    context.read<FavoritesCubit>().loadFavorites();
     super.initState();
   }
 
@@ -38,7 +34,6 @@ class _DetailProductState extends State<DetailProduct> {
           }
           if (state is DetailProductLoaded) {
             final detailProduct = state.detailProduct;
-            final isFav = widget.favorites;
             final size = MediaQuery.of(context).size;
             return Center(
               child: SizedBox(
@@ -69,7 +64,7 @@ class _DetailProductState extends State<DetailProduct> {
                           '${detailProduct.category}',
                           style: TextStyle(
                             fontSize: 12.sp,
-                            color: AppColors.secondary,
+                            color: AppColors.secondaryLight,
                           ),
                         ),
                         Text(
@@ -77,7 +72,7 @@ class _DetailProductState extends State<DetailProduct> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18.sp,
-                            color: AppColors.accent,
+                            color: AppColors.accentLight,
                           ),
                         ),
                         Row(
@@ -100,28 +95,41 @@ class _DetailProductState extends State<DetailProduct> {
                             ),
                             Row(
                               children: [
-                                InkWell(
-                                  onTap: () {
-                                    // Contex.add<FavoritesCubit>().
-                                    context
-                                        .read<FavoritesCubit>()
-                                        .ToggleFavorite(detailProduct);
+                                BlocBuilder<FavoritesCubit, FavoritesState>(
+                                  builder: (context, state) {
+                                    List<int> _currentFavIds = [];
+                                    if (state is FavoriteLoaded) {
+                                      _currentFavIds = state.favorites;
+                                    }
+                                    final isFav = _currentFavIds.contains(
+                                      detailProduct.id,
+                                    );
+                                    return InkWell(
+                                      onTap: () {
+                                        // Contex.add<FavoritesCubit>().
+                                        context
+                                            .read<FavoritesCubit>()
+                                            .toggleFavorite(detailProduct);
+                                      },
+                                      splashColor: Colors.transparent,
+                                      child: AnimatedSwitcher(
+                                        duration: Duration(milliseconds: 300),
+                                        child: Icon(
+                                          isFav
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: isFav
+                                              ? Colors.red
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                    );
                                   },
-                                  splashColor: Colors.transparent,
-                                  child: AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 300),
-                                    child: Icon(
-                                      isFav
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: isFav ? Colors.red : Colors.grey,
-                                    ),
-                                  ),
                                 ),
                                 SizedBox(width: 10.sp),
                                 Icon(
                                   Icons.add_shopping_cart,
-                                  color: AppColors.secondary,
+                                  color: AppColors.secondaryLight,
                                   size: 18.sp,
                                 ),
                               ],
