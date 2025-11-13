@@ -21,12 +21,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       final result = await apiService.getAllProducts();
 
       final favIds = await _loadFavorites();
-      // print(favIds);
-
       result.fold((error) => emit(ProductError(message: error)), (data) {
         _allProducts = data;
         _favorites = _allProducts.where((p) => favIds.contains(p.id)).toList();
-        emit(ProductLoaded(listProduct: data, favorites: _favorites));
+        emit(ProductLoaded(listProduct: data));
       });
     });
     on<SearchProduct>((event, emit) async {
@@ -52,7 +50,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       if (event.results.isEmpty) {
         emit(ProductError(message: 'Not found'));
       } else {
-        emit(ProductLoaded(listProduct: event.results, favorites: _favorites));
+        emit(ProductLoaded(listProduct: event.results));
       }
     });
   }
