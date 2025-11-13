@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tugas/core/constants/app_colors.dart';
 import 'package:tugas/features/products/presentation/bloc/category/category_product_bloc.dart';
+import 'package:tugas/features/products/presentation/cubit/Favorites/favorites_cubit.dart';
 import 'package:tugas/features/products/presentation/pages/detail_product.dart';
 
 class CategoryPage extends StatefulWidget {
@@ -49,13 +50,21 @@ class _CategoryPageState extends State<CategoryPage> {
                 itemCount: state.categoryProduct.length,
                 itemBuilder: (context, index) {
                   final product = state.categoryProduct[index];
+                  // final isFav = state.favorites.contains(product);
+                  final isFav = state.favorites.any(
+                    (fav) => fav.id == product.id,
+                  );
+                  print('fav from category ${state.favorites}');
                   return InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return DetailProduct(product: product);
+                            return DetailProduct(
+                              product: product,
+                              favorites: isFav,
+                            );
                           },
                         ),
                       );
@@ -111,14 +120,22 @@ class _CategoryPageState extends State<CategoryPage> {
                             Row(
                               children: [
                                 InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                    context
+                                        .read<FavoritesCubit>()
+                                        .ToggleFavorite(product);
+                                  },
                                   splashColor: Colors.transparent,
                                   radius: 200,
                                   borderRadius: BorderRadius.circular(10),
-                                  child: Icon(
-                                    Icons.favorite_border,
-                                    color: Colors.red,
-                                    size: 18.sp,
+                                  child: AnimatedSwitcher(
+                                    duration: Duration(milliseconds: 300),
+                                    child: Icon(
+                                      isFav
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      color: isFav ? Colors.red : Colors.grey,
+                                    ),
                                   ),
                                 ),
                                 SizedBox(width: 10),

@@ -28,3 +28,12 @@ class SearchResult extends ProductEvent {
   // TODO: implement props
   List<Object> get props => [results];
 }
+
+class ToggleFavorite extends ProductEvent {
+  final ProductModel product;
+  const ToggleFavorite({required this.product});
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [product];
+}

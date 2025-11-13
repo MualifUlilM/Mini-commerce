@@ -4,6 +4,7 @@ import 'package:tugas/features/products/data/datasources/api_service.dart';
 import 'package:tugas/features/products/presentation/bloc/category/category_product_bloc.dart';
 import 'package:tugas/features/products/presentation/bloc/detailproduct/detail_product_bloc.dart';
 import 'package:tugas/features/products/presentation/bloc/products/product_bloc.dart';
+import 'package:tugas/features/products/presentation/cubit/Favorites/favorites_cubit.dart';
 import 'package:tugas/features/products/presentation/cubit/categories/categories_cubit.dart';
 import 'package:tugas/features/products/presentation/pages/home_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -43,6 +45,7 @@ class MyApp extends StatelessWidget {
               create: (context) =>
                   CategoriesCubit(ApiService(client: http.Client())),
             ),
+            BlocProvider(create: (context) => FavoritesCubit()),
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,

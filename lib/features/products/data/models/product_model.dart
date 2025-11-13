@@ -19,6 +19,9 @@ class ProductModel {
     required this.rating,
   });
 
+  @override
+  List<Object?> get props => [id];
+
   factory ProductModel.fromRawJson(String str) =>
       ProductModel.fromJson(json.decode(str));
 

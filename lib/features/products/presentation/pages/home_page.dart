@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tugas/core/constants/app_colors.dart';
 import 'package:tugas/features/products/presentation/bloc/products/product_bloc.dart';
+import 'package:tugas/features/products/presentation/cubit/Favorites/favorites_cubit.dart';
 import 'package:tugas/features/products/presentation/cubit/categories/categories_cubit.dart';
 import 'package:tugas/features/products/presentation/pages/category_page.dart';
 import 'package:tugas/features/products/presentation/pages/detail_product.dart';
@@ -88,7 +89,9 @@ class _HomePageState extends State<HomePage> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: InkWell(
+                            highlightColor: Colors.transparent,
                             splashColor: Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -118,6 +121,7 @@ class _HomePageState extends State<HomePage> {
                 return Center(child: CircularProgressIndicator());
               }
               if (state is ProductLoaded) {
+                context.read<FavoritesCubit>().loadFavorites(state.listProduct);
                 return Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(
@@ -136,13 +140,21 @@ class _HomePageState extends State<HomePage> {
                       itemCount: state.listProduct.length,
                       itemBuilder: (context, index) {
                         final product = state.listProduct[index];
+                        print('fav homepage ${state.favorites}');
+                        final isFav = state.favorites.contains(product);
                         return InkWell(
+                          highlightColor: Colors.transparent,
+                          splashColor: Colors.transparent,
+
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return DetailProduct(product: product);
+                                  return DetailProduct(
+                                    product: product,
+                                    favorites: isFav,
+                                  );
                                 },
                               ),
                             );
@@ -150,13 +162,11 @@ class _HomePageState extends State<HomePage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Flexible(
-                                child: SizedBox(
-                                  height: (size.height / 2) * 0.4,
-                                  child: Image.network(
-                                    product.image,
-                                    fit: BoxFit.contain,
-                                  ),
+                              SizedBox(
+                                height: (size.height / 2) * 0.4,
+                                child: Image.network(
+                                  product.image,
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                               Text(
@@ -175,6 +185,7 @@ class _HomePageState extends State<HomePage> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontSize: 10),
                               ),
+
                               Text(
                                 '\$ ${product.price}',
                                 textAlign: TextAlign.center,
@@ -183,6 +194,7 @@ class _HomePageState extends State<HomePage> {
                                   color: AppColors.accent,
                                 ),
                               ),
+
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -208,16 +220,27 @@ class _HomePageState extends State<HomePage> {
                                   Row(
                                     children: [
                                       InkWell(
-                                        onTap: () {},
-                                        splashColor: Colors.transparent,
-                                        radius: 200,
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Icon(
-                                          Icons.favorite_border,
-                                          color: Colors.red,
-                                          size: 18.sp,
+                                        onTap: () {
+                                          // context.read<ProductBloc>().add(
+                                          //   ToggleFavorite(product: product),
+                                          // );
+                                          context
+                                              .read<FavoritesCubit>()
+                                              .ToggleFavorite(product);
+                                        },
+                                        child: AnimatedSwitcher(
+                                          duration: Duration(milliseconds: 300),
+                                          child: Icon(
+                                            isFav
+                                                ? Icons.favorite
+                                                : Icons.favorite_border,
+                                            color: isFav
+                                                ? Colors.red
+                                                : Colors.grey,
+                                          ),
                                         ),
                                       ),
+
                                       SizedBox(width: 10),
                                       Icon(
                                         Icons.add_shopping_cart,

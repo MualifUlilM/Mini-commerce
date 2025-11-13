@@ -12,3 +12,9 @@ class GetCategoryProductEvent extends CategoryProductEvent {
 
   GetCategoryProductEvent({required this.categoryName});
 }
+
+class loadFavoritesEvent extends CategoryProductEvent {
+  final List<CategoryProductModel> allProducts;
+
+  loadFavoritesEvent({required this.allProducts});
+}

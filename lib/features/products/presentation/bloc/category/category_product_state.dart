@@ -13,8 +13,12 @@ class CategoryProductLoading extends CategoryProductState {}
 
 class CategoryProductLoaded extends CategoryProductState {
   final List<CategoryProductModel> categoryProduct;
+  final List<CategoryProductModel> favorites;
 
-  CategoryProductLoaded({required this.categoryProduct});
+  CategoryProductLoaded({
+    required this.categoryProduct,
+    required this.favorites,
+  });
 
   @override
   // TODO: implement props

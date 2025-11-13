@@ -13,10 +13,13 @@ class ProductLoading extends ProductState {}
 
 class ProductLoaded extends ProductState {
   final List<ProductModel> listProduct;
-  const ProductLoaded({required this.listProduct});
+  final List<ProductModel> favorites;
+
+  const ProductLoaded({required this.listProduct, required this.favorites});
 
   @override
-  List<Object> get props => [listProduct];
+  // TODO: implement props
+  List<Object> get props => [listProduct, favorites];
 }
 
 class ProductError extends ProductState {
