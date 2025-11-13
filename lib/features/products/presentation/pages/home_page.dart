@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:tugas/core/constants/app_colors.dart';
 import 'package:tugas/features/products/presentation/bloc/products/product_bloc.dart';
 import 'package:tugas/features/products/presentation/cubit/Favorites/favorites_cubit.dart';
@@ -116,12 +117,14 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           BlocBuilder<ProductBloc, ProductState>(
-            builder: (context, state) {
-              if (state is ProductLoading) {
+            builder: (context, productState) {
+              if (productState is ProductLoading) {
                 return Center(child: CircularProgressIndicator());
               }
-              if (state is ProductLoaded) {
-                context.read<FavoritesCubit>().loadFavorites(state.listProduct);
+              if (productState is ProductLoaded) {
+                context.read<FavoritesCubit>().loadFavorites(
+                  productState.listProduct,
+                );
                 return Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(
@@ -129,132 +132,144 @@ class _HomePageState extends State<HomePage> {
                       left: 24.sp,
                       // bottom: 16.sp,
                     ),
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisExtent: size.height / 3,
-                        mainAxisSpacing:
-                            10.0, // Space between items along the main axis
-                        crossAxisSpacing: 10.0,
-                      ),
-                      itemCount: state.listProduct.length,
-                      itemBuilder: (context, index) {
-                        final product = state.listProduct[index];
-                        print('fav homepage ${state.favorites}');
-                        final isFav = state.favorites.contains(product);
-                        return InkWell(
-                          highlightColor: Colors.transparent,
-                          splashColor: Colors.transparent,
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        // await Future.delayed(Duration(seconds: 1));
+                        // Panggil ulang data produk & kategori
+                        context.read<CategoriesCubit>().getCategories();
+                        context.read<ProductBloc>().add(FetchProductList());
+                      },
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisExtent: size.height / 3,
+                          mainAxisSpacing:
+                              10.0, // Space between items along the main axis
+                          crossAxisSpacing: 10.0,
+                        ),
+                        itemCount: productState.listProduct.length,
+                        itemBuilder: (context, index) {
+                          final product = productState.listProduct[index];
+                          print('fav homepage ${productState.favorites}');
+                          final isFav = productState.favorites.contains(
+                            product,
+                          );
+                          return InkWell(
+                            highlightColor: Colors.transparent,
+                            splashColor: Colors.transparent,
 
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return DetailProduct(
-                                    product: product,
-                                    favorites: isFav,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                height: (size.height / 2) * 0.4,
-                                child: Image.network(
-                                  product.image,
-                                  fit: BoxFit.contain,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return DetailProduct(
+                                      product: product,
+                                      favorites: isFav,
+                                    );
+                                  },
                                 ),
-                              ),
-                              Text(
-                                product.title,
-                                maxLines: 2,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              Text(
-                                product.category.name,
-                                maxLines: 2,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 10),
-                              ),
-
-                              Text(
-                                '\$ ${product.price}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: AppColors.accent,
-                                ),
-                              ),
-
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 20,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        '${product.rating.rate}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                              );
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  height: (size.height / 2) * 0.4,
+                                  child: Image.network(
+                                    product.image,
+                                    fit: BoxFit.contain,
                                   ),
-                                  Row(
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          // context.read<ProductBloc>().add(
-                                          //   ToggleFavorite(product: product),
-                                          // );
-                                          context
-                                              .read<FavoritesCubit>()
-                                              .ToggleFavorite(product);
-                                        },
-                                        child: AnimatedSwitcher(
-                                          duration: Duration(milliseconds: 300),
-                                          child: Icon(
-                                            isFav
-                                                ? Icons.favorite
-                                                : Icons.favorite_border,
-                                            color: isFav
-                                                ? Colors.red
-                                                : Colors.grey,
+                                ),
+                                Text(
+                                  product.title,
+                                  maxLines: 2,
+                                  softWrap: true,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                Text(
+                                  product.category.name,
+                                  maxLines: 2,
+                                  softWrap: true,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 10),
+                                ),
+
+                                Text(
+                                  '\$ ${product.price}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: AppColors.accent,
+                                  ),
+                                ),
+
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                          size: 20,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          '${product.rating.rate}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                      ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            // context.read<ProductBloc>().add(
+                                            //   ToggleFavorite(product: product),
+                                            // );
+                                            context
+                                                .read<FavoritesCubit>()
+                                                .ToggleFavorite(product);
+                                          },
+                                          child: AnimatedSwitcher(
+                                            duration: Duration(
+                                              milliseconds: 300,
+                                            ),
+                                            child: Icon(
+                                              isFav
+                                                  ? Icons.favorite
+                                                  : Icons.favorite_border,
+                                              color: isFav
+                                                  ? Colors.red
+                                                  : Colors.grey,
+                                            ),
+                                          ),
+                                        ),
 
-                                      SizedBox(width: 10),
-                                      Icon(
-                                        Icons.add_shopping_cart,
-                                        color: AppColors.secondary,
-                                        size: 18.sp,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                                        SizedBox(width: 10),
+                                        Icon(
+                                          Icons.add_shopping_cart,
+                                          color: AppColors.secondary,
+                                          size: 18.sp,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 );
