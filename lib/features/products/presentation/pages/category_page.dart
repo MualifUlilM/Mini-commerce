@@ -24,6 +24,8 @@ class _CategoryPageState extends State<CategoryPage> {
     super.initState();
   }
 
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -91,8 +93,10 @@ class _CategoryPageState extends State<CategoryPage> {
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppColors.primaryLight,
+                                  fontSize: 16.sp,
+                                  color: isDark
+                                      ? AppColors.primaryDark
+                                      : AppColors.primaryLight,
                                 ),
                               ),
                               Text(
@@ -101,7 +105,12 @@ class _CategoryPageState extends State<CategoryPage> {
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 10),
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: isDark
+                                      ? AppColors.secondaryDark
+                                      : AppColors.secondaryLight,
+                                ),
                               ),
                             ],
                           ),
@@ -111,8 +120,10 @@ class _CategoryPageState extends State<CategoryPage> {
                           '\$ ${product.price}',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 18,
-                            color: AppColors.accentLight,
+                            fontSize: 18.sp,
+                            color: isDark
+                                ? AppColors.accentDark
+                                : AppColors.accentLight,
                           ),
                         ),
                         Row(
@@ -125,7 +136,13 @@ class _CategoryPageState extends State<CategoryPage> {
                                 SizedBox(width: 4),
                                 Text(
                                   '${product.rating!.rate}',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.primaryDark
+                                        : AppColors.primaryLight,
+                                  ),
                                 ),
                               ],
                             ),
@@ -166,7 +183,9 @@ class _CategoryPageState extends State<CategoryPage> {
                                 SizedBox(width: 10),
                                 Icon(
                                   Icons.add_shopping_cart,
-                                  color: AppColors.secondaryLight,
+                                  color: isDark
+                                      ? AppColors.secondaryDark
+                                      : AppColors.secondaryLight,
                                   size: 18.sp,
                                 ),
                               ],
@@ -251,7 +270,9 @@ class _CategoryPageState extends State<CategoryPage> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
-                      color: AppColors.accentLight,
+                      color: isDark
+                          ? AppColors.accentDark
+                          : AppColors.accentLight,
                     ),
                   ),
                   Row(

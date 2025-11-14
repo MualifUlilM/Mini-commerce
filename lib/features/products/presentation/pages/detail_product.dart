@@ -23,6 +23,8 @@ class _DetailProductState extends State<DetailProduct> {
     super.initState();
   }
 
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,13 +60,20 @@ class _DetailProductState extends State<DetailProduct> {
                           softWrap: true,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: isDark
+                                ? AppColors.primaryDark
+                                : AppColors.primaryLight,
+                          ),
                         ),
                         Text(
                           '${detailProduct.category}',
                           style: TextStyle(
                             fontSize: 12.sp,
-                            color: AppColors.secondaryLight,
+                            color: isDark
+                                ? AppColors.secondaryDark
+                                : AppColors.secondaryLight,
                           ),
                         ),
                         Text(
@@ -72,7 +81,9 @@ class _DetailProductState extends State<DetailProduct> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18.sp,
-                            color: AppColors.accentLight,
+                            color: isDark
+                                ? AppColors.accentDark
+                                : AppColors.accentLight,
                           ),
                         ),
                         Row(
@@ -89,7 +100,13 @@ class _DetailProductState extends State<DetailProduct> {
                                 SizedBox(width: 4.sp),
                                 Text(
                                   '${detailProduct.rating!.rate}',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.primaryDark
+                                        : AppColors.primaryLight,
+                                  ),
                                 ),
                               ],
                             ),
@@ -129,7 +146,9 @@ class _DetailProductState extends State<DetailProduct> {
                                 SizedBox(width: 10.sp),
                                 Icon(
                                   Icons.add_shopping_cart,
-                                  color: AppColors.secondaryLight,
+                                  color: isDark
+                                      ? AppColors.secondaryDark
+                                      : AppColors.secondaryLight,
                                   size: 18.sp,
                                 ),
                               ],
@@ -139,7 +158,14 @@ class _DetailProductState extends State<DetailProduct> {
                       ],
                     ),
                     SizedBox(height: 20.sp),
-                    Text('${state.detailProduct.description}'),
+                    Text(
+                      '${state.detailProduct.description}',
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.primaryDark
+                            : AppColors.primaryLight,
+                      ),
+                    ),
                   ],
                 ),
               ),

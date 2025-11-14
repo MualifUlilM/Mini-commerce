@@ -11,7 +11,6 @@ class CategoriesCubit extends Cubit<CategoriesState> {
   void getCategories() async {
     emit(CategoriesLoading());
     final result = await apiService.getCategories();
-    print(result);
 
     result.fold(
       (l) => emit(CategoriesError(message: l)),

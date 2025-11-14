@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tugas/core/theme/app_colors.dart';
 import 'package:tugas/features/products/presentation/bloc/products/product_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:tugas/features/favorites/presentation/cubit/Favorites/favorites_
 import 'package:tugas/features/products/presentation/cubit/categories/categories_cubit.dart';
 import 'package:tugas/features/products/presentation/pages/category_page.dart';
 import 'package:tugas/features/products/presentation/pages/detail_product.dart';
+import 'package:tugas/features/theme/presentation/bloc/bloc/theme_switcher_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,6 +26,7 @@ class _HomePageState extends State<HomePage> {
     context.read<CategoriesCubit>().getCategories();
     context.read<ProductBloc>().add(FetchProductList());
     context.read<FavoritesCubit>().loadFavorites();
+
     super.initState();
   }
 
@@ -32,6 +35,8 @@ class _HomePageState extends State<HomePage> {
     _searchController.dispose();
     super.dispose();
   }
+
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +54,13 @@ class _HomePageState extends State<HomePage> {
           child: Text(
             "Mini—\nCommerce",
             textAlign: TextAlign.justify,
-            style: TextStyle(color: AppColors.primaryLight),
+            style: TextStyle(
+              color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+              fontSize: 20.sp,
+            ),
           ),
         ),
+
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 0),
@@ -60,12 +69,18 @@ class _HomePageState extends State<HomePage> {
               icon: SvgPicture.asset(
                 'assets/icons/shopping_bag.svg',
                 height: 24.sp,
+                color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 24),
-            child: IconButton(onPressed: () {}, icon: Icon(Icons.light_mode)),
+            child: IconButton(
+              onPressed: () {
+                context.read<ThemeSwitcherBloc>().add(ThemeSwithing());
+              },
+              icon: Icon(Icons.brightness_4_outlined, size: 24.sp),
+            ),
           ),
         ],
       ),
@@ -193,7 +208,12 @@ class _HomePageState extends State<HomePage> {
                                       softWrap: true,
                                       overflow: TextOverflow.ellipsis,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 16.sp),
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        color: isDark
+                                            ? AppColors.primaryDark
+                                            : AppColors.primaryLight,
+                                      ),
                                     ),
                                     Text(
                                       product.category.name,
@@ -201,7 +221,12 @@ class _HomePageState extends State<HomePage> {
                                       softWrap: true,
                                       overflow: TextOverflow.ellipsis,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 10.sp),
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: isDark
+                                            ? AppColors.secondaryDark
+                                            : AppColors.secondaryLight,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -212,7 +237,9 @@ class _HomePageState extends State<HomePage> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 18.sp,
-                                  color: AppColors.accentLight,
+                                  color: isDark
+                                      ? AppColors.accentDark
+                                      : AppColors.accentLight,
                                 ),
                               ),
 
@@ -235,6 +262,9 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontSize: 16.sp,
                                           fontWeight: FontWeight.bold,
+                                          color: isDark
+                                              ? AppColors.primaryDark
+                                              : AppColors.primaryLight,
                                         ),
                                       ),
                                     ],
@@ -282,7 +312,7 @@ class _HomePageState extends State<HomePage> {
                                       SizedBox(width: 10),
                                       Icon(
                                         Icons.add_shopping_cart,
-                                        color: AppColors.secondaryLight,
+                                        // color: AppColors.secondaryLight,
                                         size: 18.sp,
                                       ),
                                     ],
@@ -310,108 +340,110 @@ class _HomePageState extends State<HomePage> {
       enabled: true,
       child: Padding(
         padding: EdgeInsets.only(right: 24.sp, left: 24.sp),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            context.read<CategoriesCubit>().getCategories();
-            context.read<ProductBloc>().add(FetchProductList());
-          },
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisExtent: size.height / 3,
-              mainAxisSpacing: 10.0,
-              crossAxisSpacing: 10.0,
-            ),
-            itemCount: 6, // jumlah dummy skeleton
-            itemBuilder: (context, index) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    highlightColor: Colors.transparent,
-                    splashColor: Colors.transparent,
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisExtent: size.height / 3,
+            mainAxisSpacing: 10.0,
+            crossAxisSpacing: 10.0,
+          ),
+          itemCount: 6, // jumlah dummy skeleton
+          itemBuilder: (context, index) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
 
-                    onTap: () {},
-                    child: Column(
-                      children: [
-                        Container(
-                          height: (size.height / 2) * 0.4,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        SizedBox(height: 10.sp),
-                        Text(
-                          "product.title",
-                          maxLines: 2,
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16.sp),
-                        ),
-                        Text(
-                          "product.category",
-                          maxLines: 2,
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 10.sp),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Text(
-                    '\$ 200',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      color: AppColors.accentLight,
-                    ),
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  onTap: () {},
+                  child: Column(
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(Icons.star, color: Colors.amber, size: 20.sp),
-                          SizedBox(width: 4.sp),
-                          Text(
-                            '02',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      Container(
+                        height: (size.height / 2) * 0.4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () {},
-                            child: AnimatedSwitcher(
-                              duration: Duration(milliseconds: 300),
-                              child: Icon(Icons.favorite, color: Colors.red),
-                            ),
-                          ),
-
-                          SizedBox(width: 10),
-                          Icon(
-                            Icons.add_shopping_cart,
-                            color: AppColors.secondaryLight,
-                            size: 18.sp,
-                          ),
-                        ],
+                      SizedBox(height: 10.sp),
+                      Text(
+                        "product.title",
+                        maxLines: 2,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16.sp),
+                      ),
+                      Text(
+                        "product.category",
+                        maxLines: 2,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: isDark
+                              ? AppColors.secondaryDark
+                              : AppColors.secondaryLight,
+                        ),
                       ),
                     ],
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+
+                Text(
+                  '\$ 200',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    color: isDark ? Colors.white : AppColors.accentLight,
+                  ),
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.star, color: Colors.amber, size: 20.sp),
+                        SizedBox(width: 4.sp),
+                        Text(
+                          '02',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? AppColors.primaryDark
+                                : AppColors.primaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: () {},
+                          child: AnimatedSwitcher(
+                            duration: Duration(milliseconds: 300),
+                            child: Icon(Icons.favorite, color: Colors.red),
+                          ),
+                        ),
+
+                        SizedBox(width: 10),
+                        Icon(
+                          Icons.add_shopping_cart,
+                          // color: AppColors.secondaryLight,
+                          size: 18.sp,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

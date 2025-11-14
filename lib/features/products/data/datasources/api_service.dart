@@ -5,7 +5,6 @@ import 'package:dartz/dartz.dart';
 import 'package:tugas/features/products/data/models/category_product_model.dart';
 import 'package:tugas/features/products/data/models/product_model.dart';
 import 'package:tugas/features/products/data/models/detail_product_model.dart';
-import 'package:tugas/features/products/presentation/pages/detail_product.dart';
 
 class ApiService {
   final http.Client client;

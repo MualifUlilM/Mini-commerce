@@ -10,6 +10,7 @@ import 'package:tugas/features/products/presentation/pages/home_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tugas/features/theme/presentation/bloc/bloc/theme_switcher_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,15 +47,23 @@ class MyApp extends StatelessWidget {
                   CategoriesCubit(ApiService(client: http.Client())),
             ),
             BlocProvider(create: (context) => FavoritesCubit()),
-          ],
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Mini-Commerce',
-            theme: ThemeData(
-              // colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-              fontFamily: GoogleFonts.poppins().fontFamily,
+            BlocProvider(
+              create: (context) => ThemeSwitcherBloc()..add(SetInitialTheme()),
             ),
-            home: const HomePage(),
+          ],
+          child: BlocBuilder<ThemeSwitcherBloc, ThemeData>(
+            builder: (context, state) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Mini-Commerce',
+                theme: state.copyWith(
+                  textTheme: GoogleFonts.poppinsTextTheme(
+                    Theme.of(context).textTheme,
+                  ),
+                ),
+                home: const HomePage(),
+              );
+            },
           ),
         );
       },
