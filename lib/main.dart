@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tugas/features/cart/presentation/cubit/cubit/cart_cubit.dart';
 import 'package:tugas/features/products/data/datasources/api_service.dart';
 import 'package:tugas/features/products/presentation/bloc/category/category_product_bloc.dart';
 import 'package:tugas/features/products/presentation/bloc/detailproduct/detail_product_bloc.dart';
@@ -50,6 +51,7 @@ class MyApp extends StatelessWidget {
             BlocProvider(
               create: (context) => ThemeSwitcherBloc()..add(SetInitialTheme()),
             ),
+            BlocProvider(create: (context) => CartCubit()),
           ],
           child: BlocBuilder<ThemeSwitcherBloc, ThemeData>(
             builder: (context, state) {
