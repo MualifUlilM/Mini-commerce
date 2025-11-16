@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tugas/core/theme/app_colors.dart';
 import 'package:tugas/features/cart/presentation/cubit/cubit/cart_cubit.dart';
 import 'package:tugas/features/products/presentation/bloc/products/product_bloc.dart';
 
@@ -17,6 +19,8 @@ class _CartPageState extends State<CartPage> {
     context.read<ProductBloc>().add(FetchProductList());
     context.read<CartCubit>().loadCartItems();
   }
+
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
 
   @override
   Widget build(BuildContext context) {
@@ -58,23 +62,45 @@ class _CartPageState extends State<CartPage> {
                             itemCount: cartProducts.length,
                             itemBuilder: (context, index) {
                               final product = cartProducts[index];
-                              return Column(
-                                children: [
-                                  ListTile(
-                                    leading: Image.network(
-                                      product.image,
-                                      width: 50,
-                                      height: 50,
-                                    ),
-                                    title: Text(product.title),
-                                    subtitle: Text('\$${product.price}'),
+                              return Card(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 8.sp,
+                                  horizontal: 16.sp,
+                                ),
+
+                                color: isDark
+                                    ? AppColors.cardDark
+                                    : AppColors.cardLight,
+                                child: ListTile(
+                                  leading: Image.network(
+                                    product.image,
+                                    width: 50,
+                                    height: 50,
                                   ),
-                                  Text(
-                                    'Total Price: \$${totalPrice.toStringAsFixed(2)}',
-                                  ),
-                                ],
+                                  title: Text(product.title),
+                                  subtitle: Text('\$${product.price}'),
+                                ),
                               );
                             },
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          height: 40.sp,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Total Price: \$${totalPrice.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),

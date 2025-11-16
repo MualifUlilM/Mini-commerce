@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as Developer;
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -13,19 +14,50 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ApiService apiService;
   Timer? _debounce;
   List<ProductModel> _allProducts = [];
-  List<ProductModel> _favorites = [];
   bool isSearching = false;
+  final int _productLimit = 5;
   ProductBloc(this.apiService) : super(ProductInitial()) {
     on<FetchProductList>((event, emit) async {
       emit(ProductLoading());
-      final result = await apiService.getAllProducts();
+      final result = await apiService.getPaginatedProducts(
+        limit: _productLimit,
+        offset: 0,
+      );
 
-      final favIds = await _loadFavorites();
       result.fold((error) => emit(ProductError(message: error)), (data) {
-        _allProducts = data;
-        _favorites = _allProducts.where((p) => favIds.contains(p.id)).toList();
-        emit(ProductLoaded(listProduct: data));
+        final hasReachedMax = data.length < _productLimit;
+        Developer.log(
+          'Fetched products: ${data.length}, hasReachedMax: $hasReachedMax',
+        );
+        emit(ProductLoaded(listProduct: data, hasReachedMax: hasReachedMax));
       });
+    });
+    on<FetchMoreProducts>((event, emit) async {
+      final currentState = state;
+      if (currentState is ProductLoaded && !currentState.hasReachedMax) {
+        final currentOffset = currentState.listProduct.length;
+        final result = await apiService.getPaginatedProducts(
+          limit: _productLimit,
+          offset: currentOffset,
+        );
+        Developer.log('Fetching more products at offset $result');
+
+        result.fold((error) => emit(ProductError(message: error)), (data) {
+          Developer.log(
+            'Fetched more products: ${data.length} at offset $currentOffset',
+          );
+          if (data.isEmpty) {
+            emit(currentState.copyWith(hasReachedMax: true));
+          } else {
+            emit(
+              currentState.copyWith(
+                listProduct: currentState.listProduct + data,
+                hasReachedMax: data.length < _productLimit,
+              ),
+            );
+          }
+        });
+      }
     });
     on<SearchProduct>((event, emit) async {
       emit(ProductLoading());
@@ -54,16 +86,5 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }
     });
   }
-
-  Future<List<int>> _loadFavorites() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final favStringList = prefs.getStringList('favorite_products') ?? [];
-      return favStringList.map((e) => int.parse(e)).toList();
-    } catch (_) {
-      return [];
-    }
-  }
-
   // Future
 }

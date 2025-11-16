@@ -9,6 +9,8 @@ sealed class ProductEvent extends Equatable {
 
 class FetchProductList extends ProductEvent {}
 
+class FetchMoreProducts extends ProductEvent {}
+
 class SearchProduct extends ProductEvent {
   final String keyword;
 

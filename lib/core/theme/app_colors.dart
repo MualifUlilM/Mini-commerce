@@ -7,4 +7,6 @@ class AppColors {
   static const Color secondaryDark = Color(0xffAAAAAA);
   static const Color accentLight = Color(0xffDD8560);
   static const Color accentDark = Color(0xff227A9F);
+  static const Color cardLight = Color.fromARGB(255, 249, 248, 248);
+  static const Color cardDark = Color.fromARGB(255, 52, 52, 52);
 }
