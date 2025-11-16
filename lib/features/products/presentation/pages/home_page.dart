@@ -11,6 +11,7 @@ import 'package:tugas/features/products/presentation/cubit/categories/categories
 import 'package:tugas/features/products/presentation/pages/category_page.dart';
 import 'package:tugas/features/products/presentation/pages/detail_product.dart';
 import 'package:tugas/features/theme/presentation/bloc/bloc/theme_switcher_bloc.dart';
+import 'package:tugas/widgets/card_skeleton.dart';
 import 'package:tugas/widgets/categories_skeleton_widget.dart';
 import 'package:tugas/widgets/product_skeleton_widget.dart';
 
@@ -221,11 +222,8 @@ class _HomePageState extends State<HomePage> {
                           // 8. LOGIKA UNTUK LOADER ATAU PRODUK
                           if (index >= productState.listProduct.length) {
                             // Ini adalah item terakhir (loader)
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
+                            return CardSkeletonWidget();
                           }
-
                           // Ini adalah item produk
                           final product = productState.listProduct[index];
                           return Column(
